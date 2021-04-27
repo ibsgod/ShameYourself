@@ -10,5 +10,6 @@
     <orderEntry type="library" name="FXTrayIcon-2.8.0" level="application" />
     <orderEntry type="library" name="javafx-16" level="application" />
     <orderEntry type="library" name="json-20210307" level="application" />
+    <orderEntry type="library" name="selenium-java-3.141" level="application" />
   </component>
 </module>

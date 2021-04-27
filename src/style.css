@@ -31,3 +31,6 @@
     -fx-text-fill: black;
     -fx-font-size: 14px;
 }
+#todayrect {
+    -fx-fill: linear-gradient(to bottom right, darkorchid, fuchsia)
+}
