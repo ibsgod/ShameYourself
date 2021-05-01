@@ -1,3 +1,4 @@
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -14,6 +15,8 @@ import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class AddProcess extends Scene
 {
@@ -48,41 +51,85 @@ public class AddProcess extends Scene
         addlbl.setAlignment(Pos.CENTER);
         addlbl.setFont(new Font(16));
         vb.setSpacing(10);
-        vb.setPadding(new Insets(15, 100, 20, 100));
+        vb.setPadding(new Insets(15, 80, 20, 80));
         vb.setAlignment(Pos.CENTER);
         submit.setOnAction(e ->
         {
-            errlbl.setText("sdf");
+            System.out.println("Sdffse");
 
-            String line;
-//            Process p = null;
-            try
+            Platform.runLater(() ->
             {
+                errlbl.setText("Looking for windows...");
+            });
 
-                String command = "tasklist /v /fo list /fi \"imagename eq  " + tf.getText().trim() + "*\"| find /i  \"window title:\"";
-//                p = Runtime.getRuntime().exec(command);
-                ProcessBuilder p = new ProcessBuilder();
-                p.command(command);
-                p.redirectErrorStream();
-                System.out.println(p);
-                BufferedReader input =
-                        new BufferedReader(new InputStreamReader(p.start().getInputStream()));
 
-                System.out.println(command);
-                System.out.println(input.readLine());
-                while ((line = input.readLine()) != null)
+
+            Thread t = new Thread(() ->
+            {
+                String line;
+                Process p = null;
+                try
                 {
-                    System.out.println(1);
-                    line = line.trim();
-                    System.out.println(line);
+                    if (tf.getText().length() > 4)
+                    {
+                        String command = "tasklist /v /fo list /fi \"imagename eq  " + tf.getText().trim().substring(0, tf.getText().length() - 4) + "*\"| find /i  \"window title:\"";
+                        ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", command);
+                        pb.redirectErrorStream();
+                        p = pb.start();
+                        System.out.println(command);
+                        System.out.println(p);
+                        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                        String program = "";
+                        while ((line = input.readLine()) != null)
+                        {
+                            line = line.trim();
+                            System.out.println(line);
+                            if (line.contains("Window Title:") && !line.contains("N/A"))
+                            {
+                                program = line.substring(14, line.length());
+                            }
+                        }
+                        String finalProgram = program;
+                        String process = tf.getText().trim().substring(0, tf.getText().length() - 4).toLowerCase();
+                        Platform.runLater(() ->
+                        {
+                            boolean valid = false;
+                            if (finalProgram.length() > 0)
+                            {
+                                errlbl.setText("Found window \"" + finalProgram + "\".");
+                                valid = true;
+                            }
+                            else
+                            {
+                                errlbl.setText("Could not find window \"" + finalProgram + "\".");
+                            }
+                            if (valid && Info.ignoreList.contains(process))
+                            {
+                                errlbl.setText(errlbl.getText() + "\n" + process + " is no longer ignored.");
+                                Info.ignoreList.remove(process);
+                                valid = false;
+                            }
+                            if (valid && (Info.todayProg.containsKey(process) || Info.addList.contains(process)))
+                            {
+                                errlbl.setText(errlbl.getText() + "\n" + process + " already in list.");
+                                Info.ignoreList.remove(process);
+                                valid = false;
+                            }
+                            if (valid)
+                            {
+                                errlbl.setText(errlbl.getText() + "\n" + process + " added to list.");
+                                Info.addList.add(process);
+                            }
 
+                        });
+                    }
                 }
-                System.out.println("sdf");
-            }
-            catch (IOException ioException)
-            {
-                ioException.printStackTrace();
-            }
+                catch (IOException ioException)
+                {
+                    ioException.printStackTrace();
+                }
+            });
+            t.start();
         });
 
     }

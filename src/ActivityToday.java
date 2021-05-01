@@ -34,6 +34,7 @@ public class ActivityToday extends Scene
     Button delbutt = new Button("Ignore");
     Button addbutt = new Button("Program not on list?");
     Stage stage;
+    boolean startup = true;
     class ProcSort implements Comparator<Node>
     {
         @Override
@@ -61,8 +62,7 @@ public class ActivityToday extends Scene
         Region re = new Region();
         re.setPrefSize(50, 50);
         centbutt.getChildren().add(re);
-        addbutt.setPrefHeight(40);
-//        centbutt.getChildren().add(addbutt);
+        centbutt.getChildren().add(addbutt);
         Timer t = new Timer();
         t.schedule(new TimerTask()
         {
@@ -106,7 +106,7 @@ public class ActivityToday extends Scene
         {
             Stage addStage = new Stage();
             BorderPane bpp = new BorderPane();
-            AddProcess addScene = new AddProcess(addStage, bpp, 450, 150);
+            AddProcess addScene = new AddProcess(addStage, bpp, 450, 200);
             addStage.setTitle("Add Process");
             addStage.setScene(addScene);
             addStage.show();
@@ -121,13 +121,21 @@ public class ActivityToday extends Scene
         {
             if (Info.todayProg.containsKey(proc))
             {
-                Info.todayProg.put(proc, Info.todayProg.get(proc) + 1);
+                if (!startup)
+                {
+                    Info.todayProg.put(proc, Info.todayProg.get(proc) + 1);
+                }
+                else
+                {
+                    Info.todayProg.put(proc, Info.todayProg.get(proc));
+                }
             }
             else
             {
                 Info.todayProg.put(proc, 0);
             }
         }
+        startup = false;
         for(String prog : Info.todayProg.keySet())
         {
             if (Info.ignoreList.contains(prog))

@@ -19,7 +19,7 @@ public class Main extends Application
 
     public void start(Stage primaryStage) throws Exception
     {
-        today = new ActivityToday(bp, 600, 600, primaryStage);
+        today = new ActivityToday(bp, 650, 600, primaryStage);
         if (!Info.file.createNewFile())
         {
             Info.readJSON(Info.file);
@@ -48,7 +48,7 @@ public class Main extends Application
                     }
                 });
             }
-        }, 0, 60000);
+        }, 0, 30000);
     }
 
 
@@ -59,33 +59,55 @@ public class Main extends Application
 
     public void getProcesses()
     {
+        System.out.println("SDf");
         if (LocalDate.now().getYear() > Integer.parseInt(Info.currDate.substring(4, 8)) || LocalDate.now().getMonthValue() > Integer.parseInt(Info.currDate.substring(2, 4)) || LocalDate.now().getDayOfMonth() > Integer.parseInt(Info.currDate.substring(0, 2)))
         {
             Info.currDate = String.format("%02d", LocalDate.now().getDayOfMonth()) + String.format("%02d", LocalDate.now().getMonthValue()) + LocalDate.now().getYear();
             Info.todayProg.clear();
         }
-        try
+        Thread t = new Thread(() ->
         {
-            String line;
-            Process p = Runtime.getRuntime().exec("powershell \"gps | where {$_.MainWindowTitle -and( $_.Description -ne '') } | select Description\n ");
-            BufferedReader input =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
-            procs.clear();
-            while ((line = input.readLine()) != null)
+            try
             {
-                line = line.trim();
-                if (!line.contains("Description") && !line.contains("-----------") && line.length() > 0)
+                String line;
+                Process p = Runtime.getRuntime().exec("powershell \"gps | where {$_.MainWindowTitle -and( $_.Description -ne '') } | select Description\n ");
+                BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                procs.clear();
+                while ((line = input.readLine()) != null)
                 {
-                    procs.add(line);
-                }
+                    line = line.trim();
+                    if (!line.contains("Description") && !line.contains("-----------") && line.length() > 0)
+                    {
+                        procs.add(line);
+                    }
 
+                }
+                String command = "";
+                ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", command);
+                pb.redirectErrorStream();
+                for (int i = 0; i < Info.addList.size(); i++)
+                {
+                    command = "tasklist /v /fo list /fi \"imagename eq  " + Info.addList.get(i) + "*\"| find /i  \"image name:\"";
+                    System.out.println(command);
+                    pb.command("cmd.exe", "/c", command);
+                    p = pb.start();
+                    p.waitFor();
+                    input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                    line = input.readLine();
+                    System.out.println(line);
+                    if (line != null && line.contains("Image Name:") && !line.contains("N/A"))
+                    {
+                        procs.add(line.trim().split(" ")[line.trim().split(" ").length - 1].substring(0, line.trim().split(" ")[line.trim().split(" ").length - 1].length() - 4));
+                    }
+                }
+                input.close();
             }
-            input.close();
-        }
-        catch (Exception err)
-        {
-            err.printStackTrace();
-        }
+            catch (Exception err)
+            {
+                err.printStackTrace();
+            }
+        });
+        t.start();
     }
 
 

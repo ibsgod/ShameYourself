@@ -18,6 +18,7 @@ public class Info
     static String home = System.getProperty("user.home") + "/Documents/shamefuldata.json";
     static File file = new File(home);
     static ArrayList<String> ignoreList = new ArrayList<String>();
+    static ArrayList<String> addList = new ArrayList<String>();
     static String currDate = String.format("%02d", LocalDate.now().getDayOfMonth()) + String.format("%02d", LocalDate.now().getMonthValue()) + LocalDate.now().getYear();
     public static void readJSON(File file) throws Exception
     {
@@ -38,6 +39,12 @@ public class Info
             for (int i = 0; i < jignore.length(); i++)
             {
                 ignoreList.add(jignore.getString(i));
+            }
+            JSONArray jadd = mj.getJSONArray("addList");
+            addList.clear();
+            for (int i = 0; i < jadd.length(); i++)
+            {
+                addList.add(jadd.getString(i));
             }
             currDate = mj.getString("currDate");
             JSONObject jtodayProg = mj.getJSONObject("todayProg");
@@ -96,10 +103,13 @@ public class Info
         JSONArray jignore = new JSONArray();
         jignore.putAll(ignoreList);
         mainJSON.put("ignoreList", jignore);
+        JSONArray jadd = new JSONArray();
+        jadd.putAll(addList);
+        mainJSON.put("addList", jadd);
         JSONObject jtodayProg = new JSONObject();
         for (String prog: todayProg.keySet())
         {
-            jtodayProg.put(prog, todayProg.get(prog)-1);
+            jtodayProg.put(prog, todayProg.get(prog));
         }
         mainJSON.put("todayProg", jtodayProg);
         JSONObject jprogToDates = new JSONObject();
