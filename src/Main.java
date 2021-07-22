@@ -59,7 +59,7 @@ public class Main extends Application
 
     public void getProcesses()
     {
-        System.out.println("SDf");
+//        System.out.println("SDf");
         if (LocalDate.now().getYear() > Integer.parseInt(Info.currDate.substring(4, 8)) || LocalDate.now().getMonthValue() > Integer.parseInt(Info.currDate.substring(2, 4)) || LocalDate.now().getDayOfMonth() > Integer.parseInt(Info.currDate.substring(0, 2)))
         {
             Info.currDate = String.format("%02d", LocalDate.now().getDayOfMonth()) + String.format("%02d", LocalDate.now().getMonthValue()) + LocalDate.now().getYear();
@@ -88,13 +88,13 @@ public class Main extends Application
                 for (int i = 0; i < Info.addList.size(); i++)
                 {
                     command = "tasklist /v /fo list /fi \"imagename eq  " + Info.addList.get(i) + "*\"| find /i  \"image name:\"";
-                    System.out.println(command);
+//                    System.out.println(command);
                     pb.command("cmd.exe", "/c", command);
                     p = pb.start();
                     p.waitFor();
                     input = new BufferedReader(new InputStreamReader(p.getInputStream()));
                     line = input.readLine();
-                    System.out.println(line);
+//                    System.out.println(line);
                     if (line != null && line.contains("Image Name:") && !line.contains("N/A"))
                     {
                         procs.add(line.trim().split(" ")[line.trim().split(" ").length - 1].substring(0, line.trim().split(" ")[line.trim().split(" ").length - 1].length() - 4));

@@ -55,7 +55,7 @@ public class AddProcess extends Scene
         vb.setAlignment(Pos.CENTER);
         submit.setOnAction(e ->
         {
-            System.out.println("Sdffse");
+//            System.out.println("Sdffse");
 
             Platform.runLater(() ->
             {
@@ -76,14 +76,14 @@ public class AddProcess extends Scene
                         ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", command);
                         pb.redirectErrorStream();
                         p = pb.start();
-                        System.out.println(command);
-                        System.out.println(p);
+//                        System.out.println(command);
+//                        System.out.println(p);
                         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
                         String program = "";
                         while ((line = input.readLine()) != null)
                         {
                             line = line.trim();
-                            System.out.println(line);
+//                            System.out.println(line);
                             if (line.contains("Window Title:") && !line.contains("N/A"))
                             {
                                 program = line.substring(14, line.length());
